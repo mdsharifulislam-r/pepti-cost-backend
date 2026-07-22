@@ -1,6 +1,11 @@
 import express from 'express';
 import { AuthRoutes } from '../app/modules/auth/auth.route';
 import { UserRoutes } from '../app/modules/user/user.route';
+import { VendorRoutes } from '../app/modules/vendor/vendor.route';
+import { PeptidesRoutes } from '../app/modules/peptides/peptides.route';
+import { BlogRoutes } from '../app/modules/blog/blog.route';
+import { DisclaimerRoutes } from '../app/modules/disclaimer/disclaimer.route';
+import { FaqRoutes } from '../app/modules/faq/faq.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -12,6 +17,26 @@ const apiRoutes = [
     path: '/auth',
     route: AuthRoutes,
   },
+  {
+    path: '/vendor',
+    route: VendorRoutes,
+  },
+  {
+    path: '/peptides',
+    route: PeptidesRoutes,
+  },
+  {
+    path: '/blog',
+    route: BlogRoutes,
+  },
+  {
+    path:"/disclaimer",
+    route:DisclaimerRoutes
+  },
+  {
+    path:"/faq",
+    route:FaqRoutes
+  }
 ];
 
 apiRoutes.forEach(route => router.use(route.path, route.route));
