@@ -9,23 +9,25 @@ import AggregateQueryBuilder from '../../builder/AggrigateQueryBuilder';
 const createVendorIntoDB = async (vendor: IVendor): Promise<IVendor> => {
     const totalPrice = Number((vendor.price_per_unit * vendor.unit).toFixed(2))
     vendor.total_price = totalPrice
-
-    if(vendor.has_discount){
-        vendor.discounted_price = Number((totalPrice - (totalPrice * ((vendor?.discount_amount||0) / 100))).toFixed(2))
+    if (typeof vendor.payment_methods == "string") {
+        vendor.payment_methods = (vendor.payment_methods as any as string)?.split(',')?.map((s) => s.trim()) as any
     }
-    if(vendor.peptide){
+    if (vendor.has_discount) {
+        vendor.discounted_price = Number((totalPrice - (totalPrice * ((vendor?.discount_amount || 0) / 100))).toFixed(2))
+    }
+    if (vendor.peptide_str) {
         const peptide = await Peptides.findOne({
-            name:{
-                $regex:vendor.peptide,
-                $options:'i'
+            name: {
+                $regex: vendor.peptide_str,
+                $options: 'i'
             }
         })
 
-        if(peptide){
+        if (peptide) {
             vendor.peptide = peptide._id
             vendor.peptide_str = peptide.name
-        }else{
-            vendor.peptide_str = vendor.peptide as any
+        } else {
+            vendor.peptide_str = vendor.peptide_str
         }
     }
     const result = await Vendor.create(vendor);
@@ -33,8 +35,8 @@ const createVendorIntoDB = async (vendor: IVendor): Promise<IVendor> => {
 };
 
 
-const getAllVendorsFromDB = async (query:Record<string, any>) => {
-    const vendorQuery = new QueryBuilder(Vendor.find({status:"active"}), query).paginate().fields().sort().search(['name','peptide_str']).filter()
+const getAllVendorsFromDB = async (query: Record<string, any>) => {
+    const vendorQuery = new QueryBuilder(Vendor.find({ status: "active" }), query).paginate().fields().sort().search(['name', 'peptide_str']).filter()
     const [vendors, paginationInfo] = await Promise.all([vendorQuery.modelQuery.exec(), vendorQuery.getPaginationInfo()]);
     return { vendors, paginationInfo };
 };
@@ -66,7 +68,7 @@ const buldVendorsFromExcel = async (file: any) => {
     const data = xlsx.utils.sheet_to_json(worksheet);
     await Promise.all(
         data.map(async (vendor: any) => {
-            const result = await kafkaProducer.sendMessage('peptide',{type:'create',data:vendor})
+            const result = await kafkaProducer.sendMessage('peptide', { type: 'create', data: vendor })
             return result;
         })
     )
@@ -78,7 +80,7 @@ const getLowestPricePeptidesForToday = async () => {
     const vendors = await Vendor.find({
         createdAt: { $gte: date },
         status: "active",
-    },{name:1,price_per_unit:1,discount_amount:1,peptide_str:1}).sort({ price_per_unit: 1, discount_amount: -1 }).limit(8);
+    }, { name: 1, price_per_unit: 1, discount_amount: 1, peptide_str: 1 }).sort({ price_per_unit: 1, discount_amount: -1 }).limit(8);
     return vendors;
 }
 
@@ -90,7 +92,7 @@ const getBiggestSavingForToday = async () => {
         createdAt: { $gte: date },
         status: "active",
         has_discount: true
-    },{peptide_str:1,discount_amount:1}).sort({ discount_amount: -1 }).limit(8);
+    }, { peptide_str: 1, discount_amount: 1 }).sort({ discount_amount: -1 }).limit(8);
     return vendors;
 }
 
@@ -100,12 +102,12 @@ const getTopRatedVendorsForToday = async () => {
     const vendors = await Vendor.find({
         createdAt: { $gte: date },
         status: "active",
-    },{name:1,rating:1}).sort({ rating: -1 }).limit(5);
+    }, { name: 1, rating: 1 }).sort({ rating: -1 }).limit(5);
     return vendors;
 }
 
 
-const getPeptidesDetails = async ()=>{
+const getPeptidesDetails = async () => {
 
     const peptides = await Vendor.aggregate([
         {
@@ -130,24 +132,24 @@ const getPeptidesDetails = async ()=>{
     return peptides
 }
 
-const getVendorList = async (query:Record<string, any>) => {
+const getVendorList = async (query: Record<string, any>) => {
     const vendorQuery = new AggregateQueryBuilder(Vendor, query).paginate().sort()
     vendorQuery.insertCustomStage([
         {
-            $group:{
-                _id:"$name",
-                name:{$first:"$name"},
-                count:{$sum:1},
-                about:{$first:"$about"},
-                rating:{$first:"$rating"},
-                total_reviews:{$first:"$total_reviews"},
-                website_url:{$first:"$website_url"},
-                minPrice:{$min:"$price_per_unit"},
-                quality:{$first:"$quality"},
-                has_discount:{$first:"$has_discount"},
-                discount_amount:{$first:"$discount_amount"},
-                is_verified:{$first:"$is_verified"},
-                coupon_code:{$first:"$coupon_code"},
+            $group: {
+                _id: "$name",
+                name: { $first: "$name" },
+                count: { $sum: 1 },
+                about: { $first: "$about" },
+                rating: { $first: "$rating" },
+                total_reviews: { $first: "$total_reviews" },
+                website_url: { $first: "$website_url" },
+                minPrice: { $min: "$price_per_unit" },
+                quality: { $first: "$quality" },
+                has_discount: { $first: "$has_discount" },
+                discount_amount: { $first: "$discount_amount" },
+                is_verified: { $first: "$is_verified" },
+                coupon_code: { $first: "$coupon_code" },
             }
         }
     ])

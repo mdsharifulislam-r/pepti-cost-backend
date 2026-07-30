@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IVendor, VendorModel } from './vendor.interface'; 
+import { IVendor, VendorModel } from './vendor.interface';
 
 const vendorSchema = new Schema<IVendor, VendorModel>({
   name: {
@@ -77,6 +77,16 @@ const vendorSchema = new Schema<IVendor, VendorModel>({
   },
   peptide_str: {
     type: String,
+    required: false
+  },
+  delivery_cost: {
+    type: Number,
+    required: false,
+    default: 0
+  },
+  payment_methods: {
+    type: [String],
+    enum: ["Credit/Debit Card", "Paypal", "Stripe", "Bank", "Apple Pay", "Google Pay"],
     required: false
   }
 }, {
