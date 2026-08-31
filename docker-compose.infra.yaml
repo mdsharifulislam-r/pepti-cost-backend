@@ -1,8 +1,7 @@
-
-
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -11,35 +10,41 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
     ports:
       - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://187.124.93.197:9092
+
+      # Single broker configuration
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_MIN_INSYNC_REPLICAS: 1
+
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
     depends_on:
       - zookeeper
     networks:
       - template-network
 
-
   redis:
-    image: redis
+    image: redis:latest
+    container_name: redis
     ports:
-      - 6379:6379
+      - "6379:6379"
     volumes:
       - redisdata:/data
     networks:
       - template-network
 
-
 volumes:
-  # mongo_data:
   redisdata:
-  # esdata:
 
 networks:
   template-network:
