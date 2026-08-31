@@ -9,6 +9,7 @@ import { FaqRoutes } from '../app/modules/faq/faq.route';
 import { BannerRoutes } from '../app/modules/banner/banner.route';
 import { SupportRoutes } from '../app/modules/support/support.route';
 import { ApplicationRoutes } from '../app/modules/application/application.route';
+import { AdminRoutes } from '../app/modules/admin/admin.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -51,6 +52,10 @@ const apiRoutes = [
   {
     path: "/application",
     route: ApplicationRoutes
+  },
+  {
+    path: "/admin",
+    route: AdminRoutes
   }
 ];
 
