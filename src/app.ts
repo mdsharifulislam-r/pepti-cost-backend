@@ -11,6 +11,8 @@ import requestIp from 'request-ip';
 import { handleChunkUpload } from './helpers/handleChunkUpload';
 import { fileStreamHandler } from './helpers/fileStreamingHelper';
 import { handleStripeWebhook } from './webhooks/handleStripeWebhook';
+import dns from 'dns';
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 const app = express();
 // app.get("/stripe/webhook",express.raw({type:"application/json"}),handleStripeWebhook); /// stripe webhook
 const limiter = rateLimit({
