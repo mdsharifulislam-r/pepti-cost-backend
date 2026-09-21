@@ -30,6 +30,16 @@ const createVendorIntoDB = async (vendor: IVendor): Promise<IVendor> => {
             vendor.peptide_str = vendor.peptide_str
         }
     }
+
+    if(vendor.peptide){
+        const peptide = await Peptides.findOne({
+            _id: vendor.peptide
+        })
+        if(peptide){
+            vendor.peptide_str = peptide.name
+        }
+    }
+
     const result = await Vendor.create(vendor);
     return result;
 };
