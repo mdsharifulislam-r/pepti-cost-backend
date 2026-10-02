@@ -5,7 +5,7 @@ const createPeptideInfoZodSchema = z.object({
   body: z.object({
     headline: z.string({ required_error: 'Headline is required' }),
     content: z.string({ required_error: 'Content is required' }),
-    category: z.nativeEnum(BLOG_TYPE),
+    category: z.string().optional(),
     tags: z.array(z.string()),
   }),
 });

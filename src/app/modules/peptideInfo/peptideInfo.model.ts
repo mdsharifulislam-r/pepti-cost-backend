@@ -21,7 +21,7 @@ const peptideInfoSchema = new Schema<IPeptideInfo, PeptideInfoModel>({
   },
   category: {
     type: String,
-    required: true,
+    required: false,
   },
   tags: {
     type: [String],
