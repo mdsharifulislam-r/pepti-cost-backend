@@ -3,6 +3,7 @@ import { AuthRoutes } from '../app/modules/auth/auth.route';
 import { UserRoutes } from '../app/modules/user/user.route';
 import { VendorRoutes } from '../app/modules/vendor/vendor.route';
 import { PeptidesRoutes } from '../app/modules/peptides/peptides.route';
+import { PeptideInfoRoutes } from '../app/modules/peptideInfo/peptideInfo.route';
 import { BlogRoutes } from '../app/modules/blog/blog.route';
 import { DisclaimerRoutes } from '../app/modules/disclaimer/disclaimer.route';
 import { FaqRoutes } from '../app/modules/faq/faq.route';
@@ -28,6 +29,10 @@ const apiRoutes = [
   {
     path: '/peptides',
     route: PeptidesRoutes,
+  },
+  {
+    path: '/peptideInfo',
+    route: PeptideInfoRoutes,
   },
   {
     path: '/blog',
